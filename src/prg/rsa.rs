@@ -72,7 +72,10 @@ mod test {
 
         let mut cnts = std::collections::BTreeMap::new();
 
-        for _ in 0..1_000_000 {
+        const ITERATIONS: usize = 1_000_000;
+        const EXPECTED_CNT: usize = 1_000_000 / (u8::MAX as usize + 1);
+
+        for _ in 0..ITERATIONS {
             let val = prg.gen_u8();
             *cnts.entry(val).or_insert(0) += 1;
         }
@@ -80,12 +83,17 @@ mod test {
         println!("Statistics:");
 
         let min = cnts.values().min().unwrap();
-        let max = cnts.values().max().unwrap();
+        let deviation = (*min as f64 / EXPECTED_CNT as f64 - 1.) * 100.;
+        println!("Min: {} ({:.2}% deviation)", min, deviation);
 
-        println!("Min: {}\nMax: {}", min, max);
+        let max = cnts.values().max().unwrap();
+        let deviation = (*max as f64 / EXPECTED_CNT as f64 - 1.) * 100.;
+        println!("Min: {} ({:.2}% deviation)", max, deviation);
 
         for (val, cnt) in cnts {
-            println!("{}: {}", val, cnt);
+            let deviation = (cnt as f64 / EXPECTED_CNT as f64 - 1.) * 100.;
+
+            println!("{}: {} ({:.2}% deviation)", val, cnt, deviation);
         }
     }
 }
